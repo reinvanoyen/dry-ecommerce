@@ -1,0 +1,12 @@
+{
+  "name": "reinvanoyen/dry-ecommerce",
+  "description": "E-commerce package",
+  "type": "library",
+  "minimum-stability": "dev",
+  "require": {},
+  "autoload": {
+    "psr-4": {
+      "Tnt\\Ecommerce\\": "src/"
+    }
+  }
+}
