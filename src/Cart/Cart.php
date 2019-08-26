@@ -10,10 +10,10 @@ use Tnt\Ecommerce\Contracts\CartInterface;
 use Tnt\Ecommerce\Contracts\CartItemInterface;
 use Tnt\Ecommerce\Contracts\CustomerInterface;
 use Tnt\Ecommerce\Contracts\DiscountInterface;
-use Tnt\Ecommerce\Contracts\FulfillmentMethodCollectionInterface;
-use Tnt\Ecommerce\Contracts\FulfillmentMethodInterface;
+use Tnt\Ecommerce\Contracts\FulfillmentInterface;
 use Tnt\Ecommerce\Contracts\OrderInterface;
 use Tnt\Ecommerce\Events\Order\Created;
+use Tnt\Ecommerce\Facade\Shop;
 use Tnt\Ecommerce\Model\CartItem;
 use Tnt\Ecommerce\Model\Order;
 
@@ -24,22 +24,15 @@ use Tnt\Ecommerce\Model\Order;
 class Cart implements CartInterface
 {
 	/**
-	 * @var FulfillmentMethodCollectionInterface $fulfillCollection
-	 */
-	private $fulfillCollection;
-
-	/**
 	 * @var \Tnt\Ecommerce\Model\Cart $cart
 	 */
 	private $cart;
 
 	/**
 	 * Cart constructor.
-	 * @param FulfillmentMethodCollectionInterface $fulfillmentMethodCollection
 	 */
-	public function __construct(FulfillmentMethodCollectionInterface $fulfillCollection)
+	public function __construct()
 	{
-		$this->fulfillCollection = $fulfillCollection;
 		$this->restore();
 	}
 
@@ -128,39 +121,31 @@ class Cart implements CartInterface
 	}
 
 	/**
-	 * @param FulfillmentMethodInterface $fulfillmentMethod
+	 * @param FulfillmentInterface $fulfillment
 	 * @return mixed|void
 	 */
-	public function setFulfillmentMethod(FulfillmentMethodInterface $fulfillmentMethod)
+	public function setFulfillment(FulfillmentInterface $fulfillment)
 	{
-		if (! $this->fulfillCollection->has($fulfillmentMethod->getId())) {
+		if (! Shop::hasFulfillment($fulfillment->getId())) {
 			return;
 		}
 
-		$this->cart->fulfillment_method = $fulfillmentMethod->getId();
+		$this->cart->fulfillment_method = $fulfillment->getId();
 		$this->cart->save();
 	}
 
 	/**
-	 * @return null|FulfillmentMethodInterface
+	 * @return null|FulfillmentInterface
 	 */
-	public function getFulfillmentMethod(): ?FulfillmentMethodInterface
+	public function getFulfillment(): ?FulfillmentInterface
 	{
 		$id = $this->cart->fulfillment_method;
 
-		if (! $id || ! $this->fulfillCollection->has($id)) {
+		if (! $id || ! Shop::hasFulfillment($id)) {
 			return null;
 		}
 
-		return $this->fulfillCollection->get($id);
-	}
-
-	/**
-	 * @return FulfillmentMethodCollectionInterface
-	 */
-	public function getFulfillmentMethods(): FulfillmentMethodCollectionInterface
-	{
-		return $this->fulfillCollection;
+		return Shop::getFulfillment($id);
 	}
 
 	/**
@@ -168,7 +153,7 @@ class Cart implements CartInterface
 	 */
 	public function getFulfillmentCost(): float
 	{
-		$fulfill = $this->getFulfillmentMethod();
+		$fulfill = $this->getFulfillment();
 
 		if ($fulfill) {
 			return $fulfill->getCost($this);
@@ -221,7 +206,7 @@ class Cart implements CartInterface
 		$order->total = self::getTotal();
 		$order->subtotal = self::getSubTotal();
 		$order->fulfillment_cost = self::getFulfillmentCost();
-		$order->fulfillment_method = self::getFulfillmentMethod();
+		$order->fulfillment_method = self::getFulfillment();
 		$order->customer = $customer;
 		$order->save();
 

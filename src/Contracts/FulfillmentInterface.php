@@ -3,10 +3,10 @@
 namespace Tnt\Ecommerce\Contracts;
 
 /**
- * Interface FulfillmentMethodInterface
+ * Interface FulfillmentInterface
  * @package Tnt\Ecommerce\Contracts
  */
-interface FulfillmentMethodInterface
+interface FulfillmentInterface
 {
 	/**
 	 * @param CartInterface $cart

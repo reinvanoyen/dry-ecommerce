@@ -14,11 +14,17 @@ class OrderItem extends Model implements OrderItemInterface
 		'order' => Order::class,
 	];
 
+	/**
+	 * @return int
+	 */
 	public function getQuantity(): int
 	{
 		return $this->quantity;
 	}
 
+	/**
+	 * @return BuyableInterface
+	 */
 	public function getBuyable(): BuyableInterface
 	{
 		$item_class = $this->item_class;

@@ -3,10 +3,10 @@
 namespace Tnt\Ecommerce\Fulfillment\Method;
 
 use Tnt\Ecommerce\Contracts\CartInterface;
-use Tnt\Ecommerce\Contracts\FulfillmentMethodInterface;
+use Tnt\Ecommerce\Contracts\FulfillmentInterface;
 use Tnt\Ecommerce\Fulfillment\HasFulfillmentAttributes;
 
-class DigitalDelivery implements FulfillmentMethodInterface
+class DigitalDelivery implements FulfillmentInterface
 {
 	use HasFulfillmentAttributes;
 

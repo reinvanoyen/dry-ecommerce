@@ -9,6 +9,11 @@ namespace Tnt\Ecommerce\Contracts;
 interface DiscountInterface
 {
 	/**
+	 * @return int
+	 */
+	public function getId(): int;
+
+	/**
 	 * @param BuyableInterface $buyable
 	 * @return bool
 	 */

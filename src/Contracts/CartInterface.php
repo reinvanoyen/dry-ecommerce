@@ -32,20 +32,15 @@ interface CartInterface
 	public function clear();
 
 	/**
-	 * @param FulfillmentMethodInterface $fulfillmentMethod
+	 * @param FulfillmentInterface $fulfillment
 	 * @return mixed
 	 */
-	public function setFulfillmentMethod(FulfillmentMethodInterface $fulfillmentMethod);
+	public function setFulfillment(FulfillmentInterface $fulfillment);
 
 	/**
-	 * @return null|FulfillmentMethodInterface
+	 * @return null|FulfillmentInterface
 	 */
-	public function getFulfillmentMethod(): ?FulfillmentMethodInterface;
-
-	/**
-	 * @return FulfillmentMethodCollectionInterface
-	 */
-	public function getFulfillmentMethods(): FulfillmentMethodCollectionInterface;
+	public function getFulfillment(): ?FulfillmentInterface;
 
 	/**
 	 * @return float

@@ -3,8 +3,11 @@
 namespace Tnt\Ecommerce\Stock;
 
 use dry\db\FetchException;
+use Oak\Dispatcher\Facade\Dispatcher;
 use Tnt\Ecommerce\Contracts\BuyableInterface;
 use Tnt\Ecommerce\Contracts\StockWorkerInterface;
+use Tnt\Ecommerce\Events\Stock\Decremented;
+use Tnt\Ecommerce\Events\Stock\Incremented;
 use Tnt\Ecommerce\Model\Stock;
 use Tnt\Ecommerce\Model\StockItem;
 
@@ -87,6 +90,8 @@ class StockWorker implements StockWorkerInterface
 			$stockItem->quantity = $quantity;
 			$stockItem->save();
 		}
+
+		Dispatcher::dispatch(Incremented::class, new Incremented($this, $buyable, $quantity));
 	}
 
 	/**
@@ -102,6 +107,8 @@ class StockWorker implements StockWorkerInterface
 			$stockItem->updated = time();
 			$stockItem->quantity = $stockItem->quantity - $quantity;
 			$stockItem->save();
+
+			Dispatcher::dispatch(Decremented::class, new Decremented($this, $buyable, $quantity));
 
 		} catch (FetchException $e) {
 			//

@@ -5,8 +5,9 @@ namespace Tnt\Ecommerce\Model;
 use dry\orm\Model;
 use Tnt\Ecommerce\Contracts\CartItemInterface;
 use Tnt\Ecommerce\Contracts\CustomerInterface;
-use Tnt\Ecommerce\Contracts\FulfillmentMethodInterface;
+use Tnt\Ecommerce\Contracts\FulfillmentInterface;
 use Tnt\Ecommerce\Contracts\OrderInterface;
+use Tnt\Ecommerce\Facade\Shop;
 
 class Order extends Model implements OrderInterface
 {
@@ -14,9 +15,12 @@ class Order extends Model implements OrderInterface
 
 	public static $special_fields = [
 		'customer' => Customer::class,
-		'fulfillment_method' => FulfillmentMethod::class,
 	];
 
+	/**
+	 * @param CartItemInterface $cartItem
+	 * @return mixed|void
+	 */
 	public function add(CartItemInterface $cartItem)
 	{
 		$item = new OrderItem();
@@ -28,38 +32,61 @@ class Order extends Model implements OrderInterface
 		$item->save();
 	}
 
+	/**
+	 * @return array
+	 */
 	public function getItems(): array
 	{
 		return $this->items;
 	}
 
+	/**
+	 * @return float
+	 */
 	public function getTotal(): float
 	{
 		return $this->total;
 	}
 
+	/**
+	 * @param CustomerInterface $customer
+	 * @return mixed|void
+	 */
 	public function setCustomer(CustomerInterface $customer)
 	{
 		$this->customer = $customer;
 		$this->save();
 	}
 
+	/**
+	 * @return CustomerInterface
+	 */
 	public function getCustomer(): CustomerInterface
 	{
 		return $this->customer;
 	}
 
-	public function setFulfillmentMethod(FulfillmentMethodInterface $fulfillmentMethod)
+	/**
+	 * @param FulfillmentInterface $fulfillmentMethod
+	 * @return mixed|void
+	 */
+	public function setFulfillment(FulfillmentInterface $fulfillmentMethod)
 	{
-		$this->fulfillment_method = $fulfillmentMethod;
+		$this->fulfillment_method = $fulfillmentMethod->getId();
 		$this->save();
 	}
 
-	public function getFulfillmentMethod(): FulfillmentMethodInterface
+	/**
+	 * @return FulfillmentInterface
+	 */
+	public function getFulfillment(): FulfillmentInterface
 	{
-		return $this->fulfillment_method;
+		return Shop::getFulfillment($this->fulfillment_method);
 	}
 
+	/**
+	 * @return \dry\orm\relationship\HasMany
+	 */
 	public function get_items()
 	{
 		return $this->has_many(OrderItem::class, 'order');

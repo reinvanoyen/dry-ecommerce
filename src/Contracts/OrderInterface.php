@@ -38,10 +38,10 @@ interface OrderInterface
 	/**
 	 * @return mixed
 	 */
-	public function setFulfillmentMethod(FulfillmentMethodInterface $fulfillmentMethod);
+	public function setFulfillment(FulfillmentInterface $fulfillmentMethod);
 
 	/**
-	 * @return FulfillmentMethodInterface
+	 * @return FulfillmentInterface
 	 */
-	public function getFulfillmentMethod(): FulfillmentMethodInterface;
+	public function getFulfillment(): FulfillmentInterface;
 }
