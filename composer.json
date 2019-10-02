@@ -4,7 +4,6 @@
   "type": "library",
   "minimum-stability": "dev",
   "require": {
-    "reinvanoyen/oak": "dev-master",
     "reinvanoyen/dry-internal-api": "dev-master"
   },
   "autoload": {
