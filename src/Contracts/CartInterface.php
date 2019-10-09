@@ -21,10 +21,10 @@ interface CartInterface
 	public function items(): array;
 
 	/**
-	 * @param CartItemInterface $cartItem
+	 * @param BuyableInterface $buyable
 	 * @return mixed
 	 */
-	public function remove(CartItemInterface $cartItem);
+	public function remove(BuyableInterface $buyable);
 
 	/**
 	 * @return mixed
