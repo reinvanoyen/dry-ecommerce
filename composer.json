@@ -1,8 +1,8 @@
 {
   "name": "reinvanoyen/dry-ecommerce",
+  "minimum-stability": "dev",
   "description": "E-commerce package",
   "type": "library",
-  "minimum-stability": "dev",
   "require": {
     "reinvanoyen/dry-internal-api": "dev-master"
   },
