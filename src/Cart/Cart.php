@@ -3,6 +3,7 @@
 namespace Tnt\Ecommerce\Cart;
 
 use dry\db\FetchException;
+use Oak\Contracts\Container\ContainerInterface;
 use Oak\Dispatcher\Facade\Dispatcher;
 use Oak\Session\Facade\Session;
 use Tnt\Ecommerce\Contracts\BuyableInterface;
@@ -11,8 +12,9 @@ use Tnt\Ecommerce\Contracts\CustomerInterface;
 use Tnt\Ecommerce\Contracts\DiscountInterface;
 use Tnt\Ecommerce\Contracts\FulfillmentInterface;
 use Tnt\Ecommerce\Contracts\OrderInterface;
+use Tnt\Ecommerce\Contracts\PaymentInterface;
+use Tnt\Ecommerce\Contracts\ShopInterface;
 use Tnt\Ecommerce\Events\Order\Created;
-use Tnt\Ecommerce\Facade\Shop;
 use Tnt\Ecommerce\Model\CartItem;
 use Tnt\Ecommerce\Model\Order;
 
@@ -23,15 +25,28 @@ use Tnt\Ecommerce\Model\Order;
 class Cart implements CartInterface
 {
     /**
+     * @var ContainerInterface $app
+     */
+    private $app;
+
+    /**
+     * @var ShopInterface $shop
+     */
+    private $shop;
+
+    /**
      * @var \Tnt\Ecommerce\Model\Cart $cart
      */
     private $cart;
 
     /**
      * Cart constructor.
+     * @param ContainerInterface $app
      */
-    public function __construct()
+    public function __construct(ContainerInterface $app, ShopInterface $shop)
     {
+        $this->app = $app;
+        $this->shop = $shop;
         $this->restore();
     }
 
@@ -138,7 +153,7 @@ class Cart implements CartInterface
      */
     public function setFulfillment(FulfillmentInterface $fulfillment)
     {
-        if (! Shop::hasFulfillment($fulfillment->getId())) {
+        if (! $this->shop->hasFulfillment($fulfillment->getId())) {
             return;
         }
 
@@ -153,11 +168,11 @@ class Cart implements CartInterface
     {
         $id = $this->cart->fulfillment_method;
 
-        if (! $id || ! Shop::hasFulfillment($id)) {
+        if (! $id || ! $this->shop->hasFulfillment($id)) {
             return null;
         }
 
-        return Shop::getFulfillment($id);
+        return $this->shop->getFulfillment($id);
     }
 
     /**
@@ -218,7 +233,7 @@ class Cart implements CartInterface
         $order->total = self::getTotal();
         $order->subtotal = self::getSubTotal();
         $order->fulfillment_cost = self::getFulfillmentCost();
-        $order->fulfillment_method = self::getFulfillment();
+        $order->fulfillment_method = (self::getFulfillment() ? self::getFulfillment()->getId() : null);
         $order->customer = $customer;
         $order->save();
 
@@ -234,7 +249,11 @@ class Cart implements CartInterface
             $order->add($item);
         }
 
+        // Dispatch an order created event
         Dispatcher::dispatch(Created::class, new Created($order));
+
+        // Pay
+        $this->app->get(PaymentInterface::class)->pay($order);
 
         return $order;
     }

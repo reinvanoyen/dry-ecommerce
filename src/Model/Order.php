@@ -11,84 +11,84 @@ use Tnt\Ecommerce\Facade\Shop;
 
 class Order extends Model implements OrderInterface
 {
-	const TABLE = 'order';
+    const TABLE = 'order';
 
-	public static $special_fields = [
-		'customer' => Customer::class,
-	];
+    public static $special_fields = [
+        'customer' => Customer::class,
+    ];
 
-	/**
-	 * @param CartItemInterface $cartItem
-	 * @return mixed|void
-	 */
-	public function add(CartItemInterface $cartItem)
-	{
-		$item = new OrderItem();
-		$item->order = $this;
-		$item->quantity = $cartItem->getQuantity();
-		$item->price = $cartItem->getPrice();
-		$item->item_id = $cartItem->getBuyable()->getId();
-		$item->item_class = get_class($cartItem->getBuyable());
-		$item->save();
-	}
+    /**
+     * @param CartItemInterface $cartItem
+     * @return mixed|void
+     */
+    public function add(CartItemInterface $cartItem)
+    {
+        $item = new OrderItem();
+        $item->order = $this;
+        $item->quantity = $cartItem->getQuantity();
+        $item->price = $cartItem->getPrice();
+        $item->item_id = $cartItem->getBuyable()->getId();
+        $item->item_class = get_class($cartItem->getBuyable());
+        $item->save();
+    }
 
-	/**
-	 * @return array
-	 */
-	public function getItems(): array
-	{
-		return $this->items;
-	}
+    /**
+     * @return array
+     */
+    public function getItems(): array
+    {
+        return $this->items;
+    }
 
-	/**
-	 * @return float
-	 */
-	public function getTotal(): float
-	{
-		return $this->total;
-	}
+    /**
+     * @return float
+     */
+    public function getTotal(): float
+    {
+        return $this->total;
+    }
 
-	/**
-	 * @param CustomerInterface $customer
-	 * @return mixed|void
-	 */
-	public function setCustomer(CustomerInterface $customer)
-	{
-		$this->customer = $customer;
-		$this->save();
-	}
+    /**
+     * @param CustomerInterface $customer
+     * @return mixed|void
+     */
+    public function setCustomer(CustomerInterface $customer)
+    {
+        $this->customer = $customer;
+        $this->save();
+    }
 
-	/**
-	 * @return CustomerInterface
-	 */
-	public function getCustomer(): CustomerInterface
-	{
-		return $this->customer;
-	}
+    /**
+     * @return CustomerInterface
+     */
+    public function getCustomer(): CustomerInterface
+    {
+        return $this->customer;
+    }
 
-	/**
-	 * @param FulfillmentInterface $fulfillmentMethod
-	 * @return mixed|void
-	 */
-	public function setFulfillment(FulfillmentInterface $fulfillmentMethod)
-	{
-		$this->fulfillment_method = $fulfillmentMethod->getId();
-		$this->save();
-	}
+    /**
+     * @param FulfillmentInterface $fulfillmentMethod
+     * @return mixed|void
+     */
+    public function setFulfillment(FulfillmentInterface $fulfillmentMethod)
+    {
+        $this->fulfillment_method = $fulfillmentMethod->getId();
+        $this->save();
+    }
 
-	/**
-	 * @return FulfillmentInterface
-	 */
-	public function getFulfillment(): FulfillmentInterface
-	{
-		return Shop::getFulfillment($this->fulfillment_method);
-	}
+    /**
+     * @return FulfillmentInterface
+     */
+    public function getFulfillment(): FulfillmentInterface
+    {
+        return Shop::getFulfillment($this->fulfillment_method);
+    }
 
-	/**
-	 * @return \dry\orm\relationship\HasMany
-	 */
-	public function get_items()
-	{
-		return $this->has_many(OrderItem::class, 'order');
-	}
+    /**
+     * @return \dry\orm\relationship\HasMany
+     */
+    public function get_items()
+    {
+        return $this->has_many(OrderItem::class, 'order');
+    }
 }

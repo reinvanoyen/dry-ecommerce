@@ -11,20 +11,20 @@ use Tnt\Ecommerce\Admin\StockManager;
 
 class AdminServiceProvider extends ServiceProvider
 {
-	public function boot(ContainerInterface $app)
-	{
-		$this->registerAdmin();
-	}
+    public function boot(ContainerInterface $app)
+    {
+        $this->registerAdmin();
+    }
 
-	public function register(ContainerInterface $app)
-	{
-		//
-	}
+    public function register(ContainerInterface $app)
+    {
+        //
+    }
 
-	private function registerAdmin()
-	{
-		Router::$modules[] = new CountryManager();
-		Router::$modules[] = new FulfillmentMethodManager();
-		Router::$modules[] = new StockManager();
-	}
+    private function registerAdmin()
+    {
+        Router::$modules[] = new CountryManager();
+        Router::$modules[] = new FulfillmentMethodManager();
+        Router::$modules[] = new StockManager();
+    }
 }

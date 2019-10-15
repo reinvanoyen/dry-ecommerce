@@ -8,49 +8,49 @@ namespace Tnt\Ecommerce\Contracts;
  */
 interface FulfillmentInterface
 {
-	/**
-	 * @param CartInterface $cart
-	 * @return float
-	 */
-	public function getCost(CartInterface $cart): float;
+    /**
+     * @return mixed
+     */
+    public function getId();
 
-	/**
-	 * @return string
-	 */
-	public function getTitle(): string;
+    /**
+     * @param CartInterface $cart
+     * @return float
+     */
+    public function getCost(CartInterface $cart): float;
 
-	/**
-	 * @return int
-	 */
-	public function getId(): int;
+    /**
+     * @return string
+     */
+    public function getTitle(): string;
 
-	/**
-	 * @param string $name
-	 * @return mixed
-	 */
-	public function getAttribute(string $name);
+    /**
+     * @param string $name
+     * @return mixed
+     */
+    public function getAttribute(string $name);
 
-	/**
-	 * @param string $name
-	 * @param $value
-	 * @return mixed
-	 */
-	public function setAttribute(string $name, $value);
+    /**
+     * @param string $name
+     * @param $value
+     * @return mixed
+     */
+    public function setAttribute(string $name, $value);
 
-	/**
-	 * @param string $name
-	 * @return bool
-	 */
-	public function hasAttribute(string $name): bool;
+    /**
+     * @param string $name
+     * @return bool
+     */
+    public function hasAttribute(string $name): bool;
 
-	/**
-	 * @return bool
-	 */
-	public function validateAttributes(): bool;
+    /**
+     * @return bool
+     */
+    public function validateAttributes(): bool;
 
 
-	/**
-	 * @return array
-	 */
-	public function requireAttributes(): array;
+    /**
+     * @return array
+     */
+    public function requireAttributes(): array;
 }

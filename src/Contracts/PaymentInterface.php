@@ -8,19 +8,9 @@ namespace Tnt\Ecommerce\Contracts;
  */
 interface PaymentInterface
 {
-	/**
-	 * @return int
-	 */
-	public function getId(): int;
-
-	/**
-	 * @param OrderInterface $order
-	 * @return mixed
-	 */
-	public function pay(OrderInterface $order);
-
-	/**
-	 * @return string
-	 */
-	public function getRedirectUrl(): string;
+    /**
+     * @param OrderInterface $order
+     * @return mixed
+     */
+    public function pay(OrderInterface $order);
 }

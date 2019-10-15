@@ -4,71 +4,71 @@ namespace Tnt\Ecommerce\Contracts;
 
 interface ShopInterface
 {
-	/**
-	 * @param PaymentInterface $payment
-	 * @return mixed
-	 */
-	public function addPayment(PaymentInterface $payment);
+    /**
+     * @param PaymentInterface $payment
+     * @return mixed
+     */
+    public function addPayment(PaymentInterface $payment);
 
-	/**
-	 * @param int $id
-	 * @return PaymentInterface
-	 */
-	public function getPayment(int $id): PaymentInterface;
+    /**
+     * @param $id
+     * @return PaymentInterface
+     */
+    public function getPayment($id): PaymentInterface;
 
-	/**
-	 * @param int $id
-	 * @return bool
-	 */
-	public function hasPayment(int $id): bool;
+    /**
+     * @param $id
+     * @return bool
+     */
+    public function hasPayment($id): bool;
 
-	/**
-	 * @return array
-	 */
-	public function getPayments(): array;
+    /**
+     * @return array
+     */
+    public function getPayments(): array;
 
-	/**
-	 * @param FulfillmentInterface $fulfillment
-	 * @return mixed
-	 */
-	public function addFulfillment(FulfillmentInterface $fulfillment);
+    /**
+     * @param FulfillmentInterface $fulfillment
+     * @return mixed
+     */
+    public function addFulfillment(FulfillmentInterface $fulfillment);
 
-	/**
-	 * @param int $id
-	 * @return FulfillmentInterface
-	 */
-	public function getFulfillment(int $id): FulfillmentInterface;
+    /**
+     * @param $id
+     * @return FulfillmentInterface
+     */
+    public function getFulfillment($id): FulfillmentInterface;
 
-	/**
-	 * @param int $id
-	 * @return bool
-	 */
-	public function hasFulfillment(int $id): bool;
+    /**
+     * @param int $id
+     * @return bool
+     */
+    public function hasFulfillment($id): bool;
 
-	/**
-	 * @return array
-	 */
-	public function getFulfillments(): array;
+    /**
+     * @return array
+     */
+    public function getFulfillments(): array;
 
-	/**
-	 * @param DiscountInterface $discount
-	 * @return mixed
-	 */
-	public function addDiscount(DiscountInterface $discount);
+    /**
+     * @param DiscountInterface $discount
+     * @return mixed
+     */
+    public function addDiscount(DiscountInterface $discount);
 
-	/**
-	 * @param int $id
-	 * @return DiscountInterface
-	 */
-	public function getDiscount(int $id): DiscountInterface;
+    /**
+     * @param $id
+     * @return DiscountInterface
+     */
+    public function getDiscount($id): DiscountInterface;
 
-	/**
-	 * @return bool
-	 */
-	public function hasDiscount(DiscountInterface $discount): bool;
+    /**
+     * @return bool
+     */
+    public function hasDiscount(DiscountInterface $discount): bool;
 
-	/**
-	 * @return array
-	 */
-	public function getDiscounts(): array;
+    /**
+     * @return array
+     */
+    public function getDiscounts(): array;
 }
