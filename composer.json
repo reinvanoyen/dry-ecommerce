@@ -3,9 +3,7 @@
   "minimum-stability": "dev",
   "description": "E-commerce package",
   "type": "library",
-  "require": {
-    "reinvanoyen/dry-internal-api": "dev-master"
-  },
+  "require": {},
   "autoload": {
     "psr-4": {
       "Tnt\\Ecommerce\\": "src/"
