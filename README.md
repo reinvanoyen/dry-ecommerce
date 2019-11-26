@@ -27,7 +27,7 @@ Name | Default
 ---- | -------
 payment | \Tnt\Ecommerce\Payment\NullPayment::class
 
-Payment can be set from configuration. *Careful!* the default value of the "payment" config property provides a default NullPayment which basically gives everything away for free. For more info on payments check out the topic payments below.
+Payment can be set from configuration. **Careful!** the default value of the "payment" config property provides a default NullPayment which basically gives everything away for free. For more info on payments check out the topic payments below.
 
 #### Concepts
 * Buyable
