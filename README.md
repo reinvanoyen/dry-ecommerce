@@ -21,7 +21,7 @@ $app->register([
 $app->bootstrap();
 ```
 
-##### Config options
+#### Config options
 
 Name | Default
 ---- | -------
