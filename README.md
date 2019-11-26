@@ -21,6 +21,14 @@ $app->register([
 $app->bootstrap();
 ```
 
+##### Config options
+
+Name | Default
+---- | -------
+payment | \Tnt\Ecommerce\Payment\NullPayment::class
+
+Payment can be set from configuration. *Careful!* the default value of the "payment" config property provides a default NullPayment which basically gives everything away for free. For more info on payments check out the topic payments below.
+
 #### Concepts
 * Buyable
 * Cart
@@ -74,7 +82,10 @@ Documentation coming soon
 Documentation coming soon
 
 ### Payment
-Documentation coming soon
+Documentation coming soon.
+
+Available payment packages:
+* Mollie: https://github.com/reinvanoyen/dry-mollie
 
 ### Stock
 Documentation coming soon
