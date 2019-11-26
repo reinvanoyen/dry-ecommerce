@@ -33,6 +33,8 @@ $app->bootstrap();
 * Tax
 
 ### Buyable
+Documentation coming soon
+
 ### Cart
 
 ```php
@@ -60,9 +62,22 @@ $order = $cart->checkout($customer);
 ```
 
 ### Discount & Coupon
+Documentation coming soon
+
 ### Fulfillment
+Documentation coming soon
+
 ### Customer
+Documentation coming soon
+
 ### Order
+Documentation coming soon
+
 ### Payment
+Documentation coming soon
+
 ### Stock
+Documentation coming soon
+
 ### Tax
+Documentation coming soon
