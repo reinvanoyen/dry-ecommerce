@@ -9,20 +9,21 @@ use Oak\Session\Facade\Session;
 use Tnt\Ecommerce\Contracts\BuyableInterface;
 use Tnt\Ecommerce\Contracts\CartInterface;
 use Tnt\Ecommerce\Contracts\CustomerInterface;
-use Tnt\Ecommerce\Contracts\DiscountInterface;
 use Tnt\Ecommerce\Contracts\FulfillmentInterface;
 use Tnt\Ecommerce\Contracts\OrderInterface;
 use Tnt\Ecommerce\Contracts\PaymentInterface;
 use Tnt\Ecommerce\Contracts\ShopInterface;
+use Tnt\Ecommerce\Contracts\TotalingInterface;
 use Tnt\Ecommerce\Events\Order\Created;
 use Tnt\Ecommerce\Model\CartItem;
+use Tnt\Ecommerce\Model\DiscountCode;
 use Tnt\Ecommerce\Model\Order;
 
 /**
  * Class Cart
  * @package Tnt\Ecommerce\Cart
  */
-class Cart implements CartInterface
+class Cart implements CartInterface, TotalingInterface
 {
     /**
      * @var ContainerInterface $app
@@ -42,6 +43,7 @@ class Cart implements CartInterface
     /**
      * Cart constructor.
      * @param ContainerInterface $app
+     * @param ShopInterface $shop
      */
     public function __construct(ContainerInterface $app, ShopInterface $shop)
     {
@@ -105,14 +107,6 @@ class Cart implements CartInterface
     }
 
     /**
-     * @return array
-     */
-    public function items(): array
-    {
-        return $this->cart->items->to_array();
-    }
-
-    /**
      * @param BuyableInterface $buyable
      * @return mixed|void
      */
@@ -132,6 +126,14 @@ class Cart implements CartInterface
         } catch (FetchException $e) {
             //
         }
+    }
+
+    /**
+     * @return array
+     */
+    public function items(): array
+    {
+        return $this->cart->items->to_array();
     }
 
     /**
@@ -190,12 +192,38 @@ class Cart implements CartInterface
     }
 
     /**
-     * @param DiscountInterface $discount
+     * @param DiscountCode $discount
      * @return mixed|void
      */
-    public function addDiscount(DiscountInterface $discount)
+    public function addDiscount(DiscountCode $discount)
     {
-        // TODO: Implement addDiscount() method.
+        $coupon = $discount->coupon;
+
+        if ($coupon && $coupon->isRedeemable()) {
+
+            $this->cart->discount = $discount;
+            $this->cart->save();
+        }
+    }
+
+    /**
+     * @return null|DiscountCode
+     */
+    public function getDiscount(): ?DiscountCode
+    {
+        $discount = $this->cart->discount;
+
+        if (! $discount) {
+            return null;
+        }
+
+        $coupon = $discount->coupon;
+
+        if (! $coupon || ! $coupon->isRedeemable($this)) {
+            return null;
+        }
+
+        return $this->cart->discount;
     }
 
     /**
@@ -217,7 +245,27 @@ class Cart implements CartInterface
      */
     public function getTotal(): float
     {
-        return $this->getSubTotal() + $this->getFulfillmentCost();
+        $total = $this->getSubTotal() + $this->getFulfillmentCost();
+
+        if (($discount = $this->getDiscount())) {
+            $total = $total - $discount->coupon->getReduction($this);
+        }
+
+        return $total;
+    }
+
+    /**
+     * @return float
+     */
+    public function getReduction(): float
+    {
+        $total = $this->getSubTotal() + $this->getFulfillmentCost();
+
+        if (($discount = $this->getDiscount())) {
+            return $discount->coupon->getReduction($this);
+        }
+
+        return 0;
     }
 
     /**
@@ -230,10 +278,12 @@ class Cart implements CartInterface
         $order = new Order();
         $order->created = time();
         $order->updated = time();
-        $order->total = self::getTotal();
-        $order->subtotal = self::getSubTotal();
-        $order->fulfillment_cost = self::getFulfillmentCost();
-        $order->fulfillment_method = (self::getFulfillment() ? self::getFulfillment()->getId() : null);
+        $order->total = $this->getTotal();
+        $order->subtotal = $this->getSubTotal();
+        $order->reduction = $this->getReduction();
+        $order->fulfillment_cost = $this->getFulfillmentCost();
+        $order->fulfillment_method = ($this->getFulfillment() ? $this->getFulfillment()->getId() : null);
+        $order->discount = $this->getDiscount();
         $order->customer = $customer;
         $order->save();
 

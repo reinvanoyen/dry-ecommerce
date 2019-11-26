@@ -3,7 +3,9 @@
   "minimum-stability": "dev",
   "description": "E-commerce package",
   "type": "library",
-  "require": {},
+  "require": {
+    "reinvanoyen/oak": "^1.0.8"
+  },
   "autoload": {
     "psr-4": {
       "Tnt\\Ecommerce\\": "src/"

@@ -17,12 +17,7 @@ interface OrderInterface
     /**
      * @return array
      */
-    public function getItems(): array;
-
-    /**
-     * @return float
-     */
-    public function getTotal(): float;
+    public function getItems();
 
     /**
      * @param CustomerInterface $customer
@@ -36,6 +31,7 @@ interface OrderInterface
     public function getCustomer(): CustomerInterface;
 
     /**
+     * @param FulfillmentInterface $fulfillmentMethod
      * @return mixed
      */
     public function setFulfillment(FulfillmentInterface $fulfillmentMethod);
@@ -44,4 +40,19 @@ interface OrderInterface
      * @return FulfillmentInterface
      */
     public function getFulfillment(): FulfillmentInterface;
+
+    /**
+     * @return float
+     */
+    public function getSubTotal(): float;
+
+    /**
+     * @return float
+     */
+    public function getTotal(): float;
+
+    /**
+     * @return float
+     */
+    public function getReduction(): float;
 }

@@ -9,6 +9,8 @@ use Tnt\Ecommerce\Contracts\ShopInterface;
 
 class Shop implements ShopInterface
 {
+    // @TODO clean this shit up
+
     /**
      * @var array $payments
      */

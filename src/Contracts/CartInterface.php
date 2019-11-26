@@ -2,6 +2,8 @@
 
 namespace Tnt\Ecommerce\Contracts;
 
+use Tnt\Ecommerce\Model\DiscountCode;
+
 /**
  * Interface CartInterface
  * @package Tnt\Ecommerce\Contracts
@@ -16,15 +18,15 @@ interface CartInterface
     public function add(BuyableInterface $buyable, int $quantity = 1);
 
     /**
-     * @return array
-     */
-    public function items(): array;
-
-    /**
      * @param BuyableInterface $buyable
      * @return mixed
      */
     public function remove(BuyableInterface $buyable);
+
+    /**
+     * @return array
+     */
+    public function items(): array;
 
     /**
      * @return mixed
@@ -48,10 +50,21 @@ interface CartInterface
     public function getFulfillmentCost(): float;
 
     /**
-     * @param DiscountInterface $discount
+     * @param DiscountCode $discount
      * @return mixed
      */
-    public function addDiscount(DiscountInterface $discount);
+    public function addDiscount(DiscountCode $discount);
+
+    /**
+     * @return null|DiscountCode
+     */
+    public function getDiscount(): ?DiscountCode;
+
+    /**
+     * @param CustomerInterface $customer
+     * @return OrderInterface
+     */
+    public function checkout(CustomerInterface $customer): OrderInterface;
 
     /**
      * @return float
@@ -64,8 +77,7 @@ interface CartInterface
     public function getTotal(): float;
 
     /**
-     * @param CustomerInterface $customer
-     * @return OrderInterface
+     * @return float
      */
-    public function checkout(CustomerInterface $customer): OrderInterface;
+    public function getReduction(): float;
 }

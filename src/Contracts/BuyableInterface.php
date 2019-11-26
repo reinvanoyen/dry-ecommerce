@@ -8,38 +8,38 @@ namespace Tnt\Ecommerce\Contracts;
  */
 interface BuyableInterface
 {
-	/**
-	 * @return string
-	 */
-	public function getId(): string;
+    /**
+     * @return string
+     */
+    public function getId(): string;
 
-	/**
-	 * @return string
-	 */
-	public function getTitle(): string;
+    /**
+     * @return string
+     */
+    public function getTitle(): string;
 
-	/**
-	 * @return string
-	 */
-	public function getDescription(): string;
+    /**
+     * @return string
+     */
+    public function getDescription(): string;
 
-	/**
-	 * @return float
-	 */
-	public function getPrice(): float;
+    /**
+     * @return float
+     */
+    public function getPrice(): float;
 
-	/**
-	 * @return string
-	 */
-	public function getThumbnailSource(): string;
+    /**
+     * @return string
+     */
+    public function getThumbnailSource(): string;
 
-	/**
-	 * @return StockWorkerInterface
-	 */
-	public function getStockWorker(): StockWorkerInterface;
+    /**
+     * @return StockWorkerInterface
+     */
+    public function getStockWorker(): StockWorkerInterface;
 
-	/**
-	 * @return TaxRateInterface
-	 */
-	public function getTaxRate(): TaxRateInterface;
+    /**
+     * @return TaxRateInterface
+     */
+    public function getTaxRate(): TaxRateInterface;
 }

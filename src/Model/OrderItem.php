@@ -8,27 +8,27 @@ use Tnt\Ecommerce\Contracts\OrderItemInterface;
 
 class OrderItem extends Model implements OrderItemInterface
 {
-	const TABLE = 'order_item';
+    const TABLE = 'ecommerce_order_item';
 
-	public static $special_fields = [
-		'order' => Order::class,
-	];
+    public static $special_fields = [
+        'order' => Order::class,
+    ];
 
-	/**
-	 * @return int
-	 */
-	public function getQuantity(): int
-	{
-		return $this->quantity;
-	}
+    /**
+     * @return int
+     */
+    public function getQuantity(): int
+    {
+        return $this->quantity;
+    }
 
-	/**
-	 * @return BuyableInterface
-	 */
-	public function getBuyable(): BuyableInterface
-	{
-		$item_class = $this->item_class;
+    /**
+     * @return BuyableInterface
+     */
+    public function getBuyable(): BuyableInterface
+    {
+        $item_class = $this->item_class;
 
-		return $item_class::load($this->item_id);
-	}
+        return $item_class::load($this->item_id);
+    }
 }

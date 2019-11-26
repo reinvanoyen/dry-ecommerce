@@ -7,25 +7,25 @@ use Tnt\Ecommerce\Contracts\CartInterface;
 
 abstract class CartEvent extends Event
 {
-	/**
-	 * @var CartInterface $cart
-	 */
-	private $cart;
+    /**
+     * @var CartInterface $cart
+     */
+    private $cart;
 
-	/**
-	 * OrderEvent constructor.
-	 * @param CartInterface $cart
-	 */
-	public function __construct(CartInterface $cart)
-	{
-		$this->cart = $cart;
-	}
+    /**
+     * OrderEvent constructor.
+     * @param CartInterface $cart
+     */
+    public function __construct(CartInterface $cart)
+    {
+        $this->cart = $cart;
+    }
 
-	/**
-	 * @return CartInterface
-	 */
-	public function getCart(): CartInterface
-	{
-		return $this->cart;
-	}
+    /**
+     * @return CartInterface
+     */
+    public function getCart(): CartInterface
+    {
+        return $this->cart;
+    }
 }

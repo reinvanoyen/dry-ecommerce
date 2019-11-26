@@ -7,14 +7,16 @@ use Tnt\Ecommerce\Contracts\CartItemInterface;
 use Tnt\Ecommerce\Contracts\CustomerInterface;
 use Tnt\Ecommerce\Contracts\FulfillmentInterface;
 use Tnt\Ecommerce\Contracts\OrderInterface;
+use Tnt\Ecommerce\Contracts\TotalingInterface;
 use Tnt\Ecommerce\Facade\Shop;
 
-class Order extends Model implements OrderInterface
+class Order extends Model implements OrderInterface, TotalingInterface
 {
-    const TABLE = 'order';
+    const TABLE = 'ecommerce_order';
 
     public static $special_fields = [
         'customer' => Customer::class,
+        'discount' => DiscountCode::class,
     ];
 
     /**
@@ -33,19 +35,11 @@ class Order extends Model implements OrderInterface
     }
 
     /**
-     * @return array
+     * @return array|mixed
      */
-    public function getItems(): array
+    public function getItems()
     {
         return $this->items;
-    }
-
-    /**
-     * @return float
-     */
-    public function getTotal(): float
-    {
-        return $this->total;
     }
 
     /**
@@ -90,5 +84,29 @@ class Order extends Model implements OrderInterface
     public function get_items()
     {
         return $this->has_many(OrderItem::class, 'order');
+    }
+
+    /**
+     * @return float
+     */
+    public function getTotal(): float
+    {
+        return $this->total;
+    }
+
+    /**
+     * @return float
+     */
+    public function getSubTotal(): float
+    {
+        return $this->subtotal;
+    }
+
+    /**
+     * @return float
+     */
+    public function getReduction(): float
+    {
+        return $this->reduction;
     }
 }

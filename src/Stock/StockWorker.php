@@ -105,7 +105,7 @@ class StockWorker implements StockWorkerInterface
 
             $stockItem = $this->getStockItem($buyable);
             $stockItem->updated = time();
-            $stockItem->quantity = $stockItem->quantity - $quantity;
+            $stockItem->quantity = $stockItem->quantity - $quantity; // @TODO call isAvailable()
             $stockItem->save();
 
             Dispatcher::dispatch(Decremented::class, new Decremented($this, $buyable, $quantity));
