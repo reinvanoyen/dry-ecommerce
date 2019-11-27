@@ -78,7 +78,7 @@ class EcommerceServiceProvider extends ServiceProvider
                 $coupon = $discount->coupon;
             }
 
-            if ($coupon && $coupon->isRedeemable()) {
+            if ($coupon && $coupon->isRedeemable($order)) {
                 $coupon->redeem($order);
             }
         });
