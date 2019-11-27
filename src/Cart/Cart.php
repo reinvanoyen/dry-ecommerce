@@ -199,7 +199,7 @@ class Cart implements CartInterface, TotalingInterface
     {
         $coupon = $discount->coupon;
 
-        if ($coupon && $coupon->isRedeemable()) {
+        if ($coupon && $coupon->isRedeemable($this)) {
 
             $this->cart->discount = $discount;
             $this->cart->save();
