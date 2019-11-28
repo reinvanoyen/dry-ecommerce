@@ -4,10 +4,11 @@ namespace Tnt\Ecommerce\Cart;
 
 use dry\db\FetchException;
 use Oak\Dispatcher\Facade\Dispatcher;
-use Oak\Session\Facade\Session;
 use Tnt\Ecommerce\Contracts\BuyableInterface;
+use Tnt\Ecommerce\Contracts\CartFactoryInterface;
 use Tnt\Ecommerce\Contracts\CartInterface;
 use Tnt\Ecommerce\Contracts\CartItemInterface;
+use Tnt\Ecommerce\Contracts\CartStorageInterface;
 use Tnt\Ecommerce\Contracts\CustomerInterface;
 use Tnt\Ecommerce\Contracts\DiscountInterface;
 use Tnt\Ecommerce\Contracts\FulfillmentInterface;
@@ -23,207 +24,217 @@ use Tnt\Ecommerce\Model\Order;
  */
 class Cart implements CartInterface
 {
-	/**
-	 * @var \Tnt\Ecommerce\Model\Cart $cart
-	 */
-	private $cart;
+    /**
+     * @var \Tnt\Ecommerce\Model\Cart $cart
+     */
+    private $cart;
 
-	/**
-	 * Cart constructor.
-	 */
-	public function __construct()
-	{
-		$this->restore();
-	}
+    /**
+     * @var CartStorageInterface $cartStorage
+     */
+    private $cartStorage;
 
-	/**
-	 * Restores the cart
-	 */
-	private function restore()
-	{
-		if (Session::has('cart')) {
-			try {
-				$this->cart = \Tnt\Ecommerce\Model\Cart::load(Session::get('cart'));
-				return;
-			} catch (FetchException $e) {}
-		}
+    /**
+     * @var CartFactoryInterface $cartFactory
+     */
+    private $cartFactory;
 
-		$cart = new \Tnt\Ecommerce\Model\Cart();
-		$cart->created = time();
-		$cart->updated = time();
-		$cart->save();
+    /**
+     * Cart constructor.
+     * @param CartStorageInterface $cartStorage
+     * @param CartFactoryInterface $cartFactory
+     */
+    public function __construct(CartStorageInterface $cartStorage, CartFactoryInterface $cartFactory)
+    {
+        $this->cartStorage = $cartStorage;
+        $this->cartFactory = $cartFactory;
 
-		Session::set('cart', $cart->id);
-		Session::save();
+        $this->restore();
+    }
 
-		$this->cart = $cart;
-	}
+    /**
+     * Restores the cart
+     */
+    private function restore()
+    {
+        $this->cart = $this->cartStorage->retrieve();
 
-	/**
-	 * @param BuyableInterface $buyable
-	 * @param int $quantity
-	 * @return mixed|void
-	 */
-	public function add(BuyableInterface $buyable, int $quantity = 1)
-	{
-		$item_class = get_class($buyable);
+        if (! $this->cart) {
 
-		try {
-			$cart_item = CartItem::load_by([
-				'cart' => $this->cart->id,
-				'item_id' => $buyable->getId(),
-				'item_class' => $item_class,
-			]);
+            $this->cart = $this->cartFactory->create();
+            $this->cartStorage->store($this->cart);
+        }
+    }
 
-			$cart_item->setQuantity($cart_item->getQuantity() + $quantity);
+    /**
+     * @param BuyableInterface $buyable
+     * @param int $quantity
+     * @return mixed|void
+     */
+    public function add(BuyableInterface $buyable, int $quantity = 1)
+    {
+        $item_class = get_class($buyable);
 
-		} catch (FetchException $e) {
+        try {
+            $cart_item = CartItem::load_by([
+                'cart' => $this->cart->id,
+                'item_id' => $buyable->getId(),
+                'item_class' => $item_class,
+            ]);
 
-			$cart_item = new CartItem();
-			$cart_item->created = time();
-			$cart_item->updated = time();
-			$cart_item->cart = $this->cart->id;
-			$cart_item->item_id = $buyable->getId();
-			$cart_item->item_class = $item_class;
-			$cart_item->quantity = $quantity;
-			$cart_item->save();
-		}
-	}
+            $cart_item->setQuantity($cart_item->getQuantity() + $quantity);
 
-	/**
-	 * @return array
-	 */
-	public function items(): array
-	{
-		return $this->cart->items->to_array();
-	}
+        } catch (FetchException $e) {
 
-	/**
-	 * @param CartItemInterface $cartItem
-	 * @return mixed|void
-	 */
-	public function remove(CartItemInterface $cartItem)
-	{
-		$cartItem->delete();
-	}
+            $cart_item = new CartItem();
+            $cart_item->created = time();
+            $cart_item->updated = time();
+            $cart_item->cart = $this->cart->id;
+            $cart_item->item_id = $buyable->getId();
+            $cart_item->item_class = $item_class;
+            $cart_item->quantity = $quantity;
+            $cart_item->save();
+        }
+    }
 
-	/**
-	 * @return mixed|void
-	 */
-	public function clear()
-	{
-		if ($this->cart) {
-			$this->cart->delete();
-		}
+    /**
+     * @return array
+     */
+    public function items(): array
+    {
+        return $this->cart->items->to_array();
+    }
 
-		Session::set('cart', null);
-		Session::save();
-	}
+    /**
+     * @param CartItemInterface $cartItem
+     * @return mixed|void
+     */
+    public function remove(CartItemInterface $cartItem)
+    {
+        $cartItem->delete();
+    }
 
-	/**
-	 * @param FulfillmentInterface $fulfillment
-	 * @return mixed|void
-	 */
-	public function setFulfillment(FulfillmentInterface $fulfillment)
-	{
-		if (! Shop::hasFulfillment($fulfillment->getId())) {
-			return;
-		}
+    /**
+     * @return mixed|void
+     */
+    public function clear()
+    {
+        if ($this->cart) {
+            $this->cart->delete();
+        }
 
-		$this->cart->fulfillment_method = $fulfillment->getId();
-		$this->cart->save();
-	}
+        $this->cartStorage->clear();
+    }
 
-	/**
-	 * @return null|FulfillmentInterface
-	 */
-	public function getFulfillment(): ?FulfillmentInterface
-	{
-		$id = $this->cart->fulfillment_method;
+    /**
+     * @param FulfillmentInterface $fulfillment
+     * @return mixed|void
+     */
+    public function setFulfillment(FulfillmentInterface $fulfillment)
+    {
+        if (! Shop::hasFulfillment($fulfillment->getId())) {
+            return;
+        }
 
-		if (! $id || ! Shop::hasFulfillment($id)) {
-			return null;
-		}
+        $this->cart->fulfillment_method = $fulfillment->getId();
+        $this->cart->save();
+    }
 
-		return Shop::getFulfillment($id);
-	}
+    /**
+     * @return null|FulfillmentInterface
+     */
+    public function getFulfillment(): ?FulfillmentInterface
+    {
+        $id = $this->cart->fulfillment_method;
 
-	/**
-	 * @return float
-	 */
-	public function getFulfillmentCost(): float
-	{
-		$fulfill = $this->getFulfillment();
+        if (! $id || ! Shop::hasFulfillment($id)) {
+            return null;
+        }
 
-		if ($fulfill) {
-			return $fulfill->getCost($this);
-		}
+        return Shop::getFulfillment($id);
+    }
 
-		return 0;
-	}
+    /**
+     * @return float
+     */
+    public function getFulfillmentCost(): float
+    {
+        $fulfill = $this->getFulfillment();
 
-	/**
-	 * @param DiscountInterface $discount
-	 * @return mixed|void
-	 */
-	public function addDiscount(DiscountInterface $discount)
-	{
-		// TODO: Implement addDiscount() method.
-	}
+        if ($fulfill) {
+            return $fulfill->getCost($this);
+        }
 
-	/**
-	 * @return float
-	 */
-	public function getSubTotal(): float
-	{
-		$cost = 0;
+        return 0;
+    }
 
-		foreach ($this->items() as $item) {
-			$cost += $item->getPrice();
-		}
+    /**
+     * @param DiscountInterface $discount
+     * @return mixed|void
+     */
+    public function addDiscount(DiscountInterface $discount)
+    {
+        // TODO: Implement addDiscount() method.
+    }
 
-		return $cost;
-	}
+    /**
+     * @return float
+     */
+    public function getSubTotal(): float
+    {
+        $cost = 0;
 
-	/**
-	 * @return float
-	 */
-	public function getTotal(): float
-	{
-		return $this->getSubTotal() + $this->getFulfillmentCost();
-	}
+        foreach ($this->items() as $item) {
+            $cost += $item->getPrice();
+        }
 
-	/**
-	 * @param CustomerInterface $customer
-	 * @return OrderInterface
-	 */
-	public function checkout(CustomerInterface $customer): OrderInterface
-	{
-		// Create the order
-		$order = new Order();
-		$order->created = time();
-		$order->updated = time();
-		$order->total = self::getTotal();
-		$order->subtotal = self::getSubTotal();
-		$order->fulfillment_cost = self::getFulfillmentCost();
-		$order->fulfillment_method = self::getFulfillment();
-		$order->customer = $customer;
-		$order->save();
+        return $cost;
+    }
 
-		// Generate an order id
-		$start = rand(5, 8);
-		$rest = 8 - $start;
+    /**
+     * @return float
+     */
+    public function getTotal(): float
+    {
+        return $this->getSubTotal() + $this->getFulfillmentCost();
+    }
 
-		$order->order_id = $order->id.'-'.\dry\util\string\random($start).'_'.\dry\util\string\random($rest);
-		$order->save();
+    /**
+     * @param CustomerInterface $customer
+     * @return OrderInterface
+     */
+    public function checkout(CustomerInterface $customer): OrderInterface
+    {
+        // Create the order
+        $order = new Order();
+        $order->created = time();
+        $order->updated = time();
+        $order->total = self::getTotal();
+        $order->subtotal = self::getSubTotal();
+        $order->fulfillment_cost = self::getFulfillmentCost();
+        $order->fulfillment_method = self::getFulfillment();
+        $order->customer = $customer;
+        $order->save();
 
-		// Add all items to the order
-		foreach ($this->items() as $item) {
-			$order->add($item);
-		}
+        // Generate an order id
+        $start = rand(5, 8);
+        $rest = 8 - $start;
 
-		Dispatcher::dispatch(Created::class, new Created($order));
+        $order->order_id = $order->id.'-'.\dry\util\string\random($start).'_'.\dry\util\string\random($rest);
+        $order->save();
 
-		return $order;
-	}
+        // Add all items to the order
+        foreach ($this->items() as $item) {
+            $order->add($item);
+        }
+
+        Dispatcher::dispatch(Created::class, new Created($order));
+
+        return $order;
+    }
+
+    public function getIdentifier()
+    {
+        return $this->cart->getIdentifier();
+    }
 }

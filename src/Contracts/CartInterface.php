@@ -68,4 +68,9 @@ interface CartInterface
 	 * @return OrderInterface
 	 */
 	public function checkout(CustomerInterface $customer): OrderInterface;
+
+    /**
+     * @return mixed
+     */
+	public function getIdentifier();
 }

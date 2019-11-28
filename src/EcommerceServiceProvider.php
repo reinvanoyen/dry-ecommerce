@@ -5,7 +5,9 @@ namespace Tnt\Ecommerce;
 use Oak\Contracts\Container\ContainerInterface;
 use Oak\ServiceProvider;
 use Tnt\Ecommerce\Cart\Cart;
+use Tnt\Ecommerce\Contracts\CartFactoryInterface;
 use Tnt\Ecommerce\Contracts\CartInterface;
+use Tnt\Ecommerce\Contracts\CartStorageInterface;
 use Tnt\Ecommerce\Contracts\ShopInterface;
 use Tnt\Ecommerce\Contracts\StockWorkerInterface;
 use Tnt\Ecommerce\Shop\Shop;
@@ -21,6 +23,8 @@ class EcommerceServiceProvider extends ServiceProvider
 	public function register(ContainerInterface $app)
 	{
 		$app->singleton(ShopInterface::class, Shop::class);
+		$app->singleton(CartStorageInterface::class, SessionCartStorage::class);
+		$app->singleton(CartFactoryInterface::class, CartFactory::class);
 		$app->singleton(CartInterface::class, Cart::class);
 		$app->set(StockWorkerInterface::class, StockWorker::class);
 	}
