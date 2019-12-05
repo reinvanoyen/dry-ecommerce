@@ -6,9 +6,9 @@ use dry\orm\Model;
 
 class StockItem extends Model
 {
-	const TABLE = 'stock_item';
+    const TABLE = 'ecommerce_stock_item';
 
-	public static $special_fields = [
-		'stock' => Stock::class,
-	];
+    public static $special_fields = [
+        'stock' => Stock::class,
+    ];
 }

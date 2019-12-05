@@ -4,12 +4,13 @@ namespace Tnt\Ecommerce;
 
 use Tnt\Ecommerce\Contracts\CartFactoryInterface;
 use Tnt\Ecommerce\Contracts\StorableInterface;
+use Tnt\Ecommerce\Model\Cart;
 
 class CartFactory implements CartFactoryInterface
 {
     public function create(): StorableInterface
     {
-        $cart = new \Tnt\Ecommerce\Model\Cart();
+        $cart = new Cart();
         $cart->created = time();
         $cart->updated = time();
         $cart->save();

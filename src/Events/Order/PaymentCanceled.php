@@ -2,7 +2,7 @@
 
 namespace Tnt\Ecommerce\Events\Order;
 
-class Created extends OrderEvent
+class PaymentCanceled extends OrderEvent
 {
     //
 }

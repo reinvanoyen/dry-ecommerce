@@ -7,15 +7,15 @@ use Tnt\Ecommerce\Contracts\CustomerInterface;
 
 class Customer extends Model implements CustomerInterface
 {
-	const TABLE = 'customer';
+    const TABLE = 'ecommerce_customer';
 
-	public function getFirstName(): string
-	{
-		return $this->first_name;
-	}
+    public function getFirstName(): string
+    {
+        return $this->first_name;
+    }
 
-	public function getLastName(): string
-	{
-		return $this->last_name;
-	}
+    public function getLastName(): string
+    {
+        return $this->last_name;
+    }
 }

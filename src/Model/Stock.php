@@ -6,5 +6,5 @@ use dry\orm\Model;
 
 class Stock extends Model
 {
-	const TABLE = 'stock';
+    const TABLE = 'ecommerce_stock';
 }
