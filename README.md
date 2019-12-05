@@ -1,6 +1,11 @@
 # dry-ecommerce
 ## E-commerce platform
 
+#### Concepts
+
+* [Installation](#installation)
+* [Payment](https://github.com/reinvanoyen/dry-ecommerce/blob/master/docs/payment.md)
+
 #### Installation
 
 ```ssh
@@ -80,12 +85,6 @@ Documentation coming soon
 
 ### Order
 Documentation coming soon
-
-### Payment
-Documentation coming soon.
-
-Available payment packages:
-* Mollie: https://github.com/reinvanoyen/dry-mollie
 
 ### Stock
 Documentation coming soon
