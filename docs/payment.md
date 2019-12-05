@@ -57,7 +57,6 @@ use Acme\PaymentClient;
 class MyCustomPayment implements PaymentInterface
 {
   private $client;
-  
   private $dispatcher;
   
   public function __construct(PaymentClient $client, DispatcherInterface $dispatcher)
