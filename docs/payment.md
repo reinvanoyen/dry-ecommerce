@@ -61,20 +61,27 @@ class MyCustomPayment implements PaymentInterface
   
   public function pay(OrderInterface $order)
   {
+    // How many is this payment for?
     $total = $order->getTotal();
     
+    // Do we give it away for free or do we need to charge the user?
     if ($total <= 0) {
+      // We've given it away for free, notify the system
       $this->dispatcher->dispatch(Paid::class, new Paid($order));
       return;
     }
     
+    // Charge the user
     $status = $this->client->pay($total);
     
-    if ($status === 'paid') {
+    // Did charging the user succeed?
+    if ($status === 'success') {
+      // The user was successfully charged, notify the system
       $this->dispatcher->dispatch(Paid::class, new Paid($order));
       return;
     }
     
+    // Everything failed, notify the system
     $this->dispatcher->dispatch(PaymentFailed::class, new PaymentFailed($order));
   }
 }
