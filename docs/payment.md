@@ -1,5 +1,5 @@
-# dry-ecommerce
-## Payment
+# Payment
+#### How payment works in dry-ecommerce and how to implement a custom payment
 
 ### Implementations available
 * [Null](https://github.com/reinvanoyen/dry-ecommerce/blob/master/src/Payment/NullPayment.php)
