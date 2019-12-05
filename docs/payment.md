@@ -1,5 +1,11 @@
 ## Payment
 
+### Implementations available
+* [Null](https://github.com/reinvanoyen/dry-ecommerce/blob/master/src/Payment/NullPayment.php)
+  * This is the default Payment provided by [dry-ecommerce](https://github.com/reinvanoyen/dry-ecommerce).
+* [Mollie](https://github.com/reinvanoyen/dry-mollie)
+  * Easy to use Dutch payment company. Visit [mollie.com](https://www.mollie.com) for more information.
+
 ### Implement a custom Payment
 
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, 
