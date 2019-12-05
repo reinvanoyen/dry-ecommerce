@@ -5,9 +5,10 @@ namespace Tnt\Ecommerce\Cart;
 use dry\db\FetchException;
 use Oak\Contracts\Container\ContainerInterface;
 use Oak\Dispatcher\Facade\Dispatcher;
-use Oak\Session\Facade\Session;
 use Tnt\Ecommerce\Contracts\BuyableInterface;
+use Tnt\Ecommerce\Contracts\CartFactoryInterface;
 use Tnt\Ecommerce\Contracts\CartInterface;
+use Tnt\Ecommerce\Contracts\CartStorageInterface;
 use Tnt\Ecommerce\Contracts\CustomerInterface;
 use Tnt\Ecommerce\Contracts\FulfillmentInterface;
 use Tnt\Ecommerce\Contracts\OrderInterface;
@@ -41,14 +42,28 @@ class Cart implements CartInterface, TotalingInterface
     private $cart;
 
     /**
+     * @var CartStorageInterface $cartStorage
+     */
+    private $cartStorage;
+
+    /**
+     * @var CartFactoryInterface $cartFactory
+     */
+    private $cartFactory;
+
+    /**
      * Cart constructor.
      * @param ContainerInterface $app
      * @param ShopInterface $shop
+     * @param CartStorageInterface $cartStorage
+     * @param CartFactoryInterface $cartFactory
      */
-    public function __construct(ContainerInterface $app, ShopInterface $shop)
+    public function __construct(ContainerInterface $app, ShopInterface $shop, CartStorageInterface $cartStorage, CartFactoryInterface $cartFactory)
     {
         $this->app = $app;
         $this->shop = $shop;
+        $this->cartStorage = $cartStorage;
+        $this->cartFactory = $cartFactory;
         $this->restore();
     }
 
@@ -57,22 +72,13 @@ class Cart implements CartInterface, TotalingInterface
      */
     private function restore()
     {
-        if (Session::has('cart')) {
-            try {
-                $this->cart = \Tnt\Ecommerce\Model\Cart::load(Session::get('cart'));
-                return;
-            } catch (FetchException $e) {}
+        $this->cart = $this->cartStorage->retrieve();
+
+        if (! $this->cart) {
+
+            $this->cart = $this->cartFactory->create();
+            $this->cartStorage->store($this->cart);
         }
-
-        $cart = new \Tnt\Ecommerce\Model\Cart();
-        $cart->created = time();
-        $cart->updated = time();
-        $cart->save();
-
-        Session::set('cart', $cart->id);
-        Session::save();
-
-        $this->cart = $cart;
     }
 
     /**
@@ -106,10 +112,6 @@ class Cart implements CartInterface, TotalingInterface
         }
     }
 
-    /**
-     * @param BuyableInterface $buyable
-     * @return mixed|void
-     */
     public function remove(BuyableInterface $buyable)
     {
         $item_class = get_class($buyable);
@@ -145,8 +147,7 @@ class Cart implements CartInterface, TotalingInterface
             $this->cart->delete();
         }
 
-        Session::set('cart', null);
-        Session::save();
+        $this->cartStorage->clear();
     }
 
     /**
@@ -306,5 +307,10 @@ class Cart implements CartInterface, TotalingInterface
         $this->app->get(PaymentInterface::class)->pay($order);
 
         return $order;
+    }
+
+    public function getIdentifier()
+    {
+        return $this->cart->getIdentifier();
     }
 }

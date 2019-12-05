@@ -80,4 +80,9 @@ interface CartInterface
      * @return float
      */
     public function getReduction(): float;
+
+    /**
+     * @return mixed
+     */
+    public function getIdentifier();
 }

@@ -9,7 +9,9 @@ use Oak\Migration\MigrationManager;
 use Oak\Migration\Migrator;
 use Oak\ServiceProvider;
 use Tnt\Ecommerce\Cart\Cart;
+use Tnt\Ecommerce\Contracts\CartFactoryInterface;
 use Tnt\Ecommerce\Contracts\CartInterface;
+use Tnt\Ecommerce\Contracts\CartStorageInterface;
 use Tnt\Ecommerce\Contracts\PaymentInterface;
 use Tnt\Ecommerce\Contracts\ShopInterface;
 use Tnt\Ecommerce\Contracts\StockWorkerInterface;
@@ -59,6 +61,8 @@ class EcommerceServiceProvider extends ServiceProvider
     public function register(ContainerInterface $app)
     {
         $app->singleton(ShopInterface::class, Shop::class);
+        $app->singleton(CartStorageInterface::class, SessionCartStorage::class);
+        $app->singleton(CartFactoryInterface::class, CartFactory::class);
         $app->singleton(CartInterface::class, Cart::class);
         $app->singleton(PaymentInterface::class, $app->get(RepositoryInterface::class)->get('ecommerce.payment', NullPayment::class));
         $app->set(StockWorkerInterface::class, StockWorker::class);

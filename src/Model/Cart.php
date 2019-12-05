@@ -2,7 +2,9 @@
 
 namespace Tnt\Ecommerce\Model;
 
-class Cart extends \dry\orm\Model
+use Tnt\Ecommerce\Contracts\StorableInterface;
+
+class Cart extends \dry\orm\Model implements StorableInterface
 {
     const TABLE = 'ecommerce_cart';
 
@@ -22,5 +24,10 @@ class Cart extends \dry\orm\Model
         }
 
         parent::delete();
+    }
+
+    public function getIdentifier()
+    {
+        return $this->id;
     }
 }
