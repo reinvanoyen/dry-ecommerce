@@ -1,7 +1,7 @@
 # dry-ecommerce
 ## E-commerce platform
 
-#### Concepts
+#### Index
 
 * [Installation](#installation)
 * [Payment](https://github.com/reinvanoyen/dry-ecommerce/blob/master/docs/payment.md)
@@ -33,17 +33,6 @@ Name | Default
 payment | \Tnt\Ecommerce\Payment\NullPayment::class
 
 **Careful!** Payment can be set from configuration. the default value of the "payment" config property provides a default NullPayment which basically gives everything away for free. For more info on payments check out the topic payments below.
-
-#### Concepts
-* Buyable
-* Cart
-* Discount & Coupon
-* Fulfillment
-* Customer
-* Order
-* Payment
-* Stock
-* Tax
 
 ### Buyable
 Documentation coming soon
