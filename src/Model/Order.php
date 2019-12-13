@@ -3,11 +3,13 @@
 namespace Tnt\Ecommerce\Model;
 
 use dry\orm\Model;
+use Oak\Dispatcher\Facade\Dispatcher;
 use Tnt\Ecommerce\Contracts\CartItemInterface;
 use Tnt\Ecommerce\Contracts\CustomerInterface;
 use Tnt\Ecommerce\Contracts\FulfillmentInterface;
 use Tnt\Ecommerce\Contracts\OrderInterface;
 use Tnt\Ecommerce\Contracts\TotalingInterface;
+use Tnt\Ecommerce\Events\Order\BuyableAdded;
 use Tnt\Ecommerce\Facade\Shop;
 
 class Order extends Model implements OrderInterface, TotalingInterface
@@ -32,6 +34,8 @@ class Order extends Model implements OrderInterface, TotalingInterface
         $item->item_id = $cartItem->getBuyable()->getId();
         $item->item_class = get_class($cartItem->getBuyable());
         $item->save();
+
+        Dispatcher::dispatch(BuyableAdded::class, new BuyableAdded($this, $cartItem->getBuyable()));
     }
 
     /**
