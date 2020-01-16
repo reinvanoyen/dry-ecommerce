@@ -17,6 +17,7 @@ use Tnt\Ecommerce\Contracts\ShopInterface;
 use Tnt\Ecommerce\Contracts\StockWorkerInterface;
 use Tnt\Ecommerce\Events\Order\Paid;
 use Tnt\Ecommerce\Payment\NullPayment;
+use Tnt\Ecommerce\Revisions\AlterCustomerAddTelephone;
 use Tnt\Ecommerce\Revisions\CreateCustomerTable;
 use Tnt\Ecommerce\Revisions\CreateDiscountCodeTable;
 use Tnt\Ecommerce\Shop\Shop;
@@ -51,6 +52,7 @@ class EcommerceServiceProvider extends ServiceProvider
                 CreateCartItemTable::class,
                 CreateStockTable::class,
                 CreateStockItemTable::class,
+                AlterCustomerAddTelephone::class,
             ]);
 
             $app->get(MigrationManager::class)
