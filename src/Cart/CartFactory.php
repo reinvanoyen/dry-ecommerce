@@ -1,6 +1,6 @@
 <?php
 
-namespace Tnt\Ecommerce;
+namespace Tnt\Ecommerce\Cart;
 
 use Tnt\Ecommerce\Contracts\CartFactoryInterface;
 use Tnt\Ecommerce\Contracts\StorableInterface;

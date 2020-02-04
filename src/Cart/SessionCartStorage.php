@@ -1,9 +1,9 @@
 <?php
 
-namespace Tnt\Ecommerce;
+namespace Tnt\Ecommerce\Cart;
 
 use dry\db\FetchException;
-use Oak\Session\Facade\Session;
+use Oak\Session\Session;
 use Tnt\Ecommerce\Contracts\CartStorageInterface;
 use Tnt\Ecommerce\Contracts\StorableInterface;
 use Tnt\Ecommerce\Model\Cart;
@@ -11,13 +11,27 @@ use Tnt\Ecommerce\Model\Cart;
 class SessionCartStorage implements CartStorageInterface
 {
     /**
+     * @var Session $session
+     */
+    private $session;
+
+    /**
+     * SessionCartStorage constructor.
+     * @param Session $session
+     */
+    public function __construct(Session $session)
+    {
+        $this->session = $session;
+    }
+
+    /**
      * @param StorableInterface $cart
      * @return mixed|void
      */
     public function store(StorableInterface $cart)
     {
-        Session::set('cart', $cart->getIdentifier());
-        Session::save();
+        $this->session->set('cart', $cart->getIdentifier());
+        $this->session->save();
     }
 
     /**
@@ -26,7 +40,7 @@ class SessionCartStorage implements CartStorageInterface
     public function retrieve(): ?StorableInterface
     {
         try {
-            return Cart::load(Session::get('cart'));
+            return Cart::load($this->session->get('cart'));
         } catch (FetchException $e) {
             //
         }
@@ -39,7 +53,7 @@ class SessionCartStorage implements CartStorageInterface
      */
     public function clear()
     {
-        Session::set('cart', null);
-        Session::save();
+        $this->session->set('cart', null);
+        $this->session->save();
     }
 }

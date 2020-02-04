@@ -3,22 +3,24 @@
 namespace Tnt\Ecommerce\Cart;
 
 use dry\db\FetchException;
-use Oak\Contracts\Container\ContainerInterface;
-use Oak\Dispatcher\Facade\Dispatcher;
+use Oak\Contracts\Dispatcher\DispatcherInterface;
 use Tnt\Ecommerce\Contracts\BuyableInterface;
 use Tnt\Ecommerce\Contracts\CartFactoryInterface;
 use Tnt\Ecommerce\Contracts\CartInterface;
 use Tnt\Ecommerce\Contracts\CartStorageInterface;
 use Tnt\Ecommerce\Contracts\CustomerInterface;
 use Tnt\Ecommerce\Contracts\FulfillmentInterface;
+use Tnt\Ecommerce\Contracts\OrderFactoryInterface;
 use Tnt\Ecommerce\Contracts\OrderInterface;
 use Tnt\Ecommerce\Contracts\PaymentInterface;
 use Tnt\Ecommerce\Contracts\ShopInterface;
 use Tnt\Ecommerce\Contracts\TotalingInterface;
+use Tnt\Ecommerce\Events\Cart\BuyableAdded;
+use Tnt\Ecommerce\Events\Cart\BuyableRemoved;
+use Tnt\Ecommerce\Events\Cart\DiscountAdded;
 use Tnt\Ecommerce\Events\Order\Created;
 use Tnt\Ecommerce\Model\CartItem;
 use Tnt\Ecommerce\Model\DiscountCode;
-use Tnt\Ecommerce\Model\Order;
 
 /**
  * Class Cart
@@ -26,11 +28,6 @@ use Tnt\Ecommerce\Model\Order;
  */
 class Cart implements CartInterface, TotalingInterface
 {
-    /**
-     * @var ContainerInterface $app
-     */
-    private $app;
-
     /**
      * @var ShopInterface $shop
      */
@@ -40,6 +37,11 @@ class Cart implements CartInterface, TotalingInterface
      * @var \Tnt\Ecommerce\Model\Cart $cart
      */
     private $cart;
+
+    /**
+     * @var PaymentInterface $payment
+     */
+    private $payment;
 
     /**
      * @var CartStorageInterface $cartStorage
@@ -52,18 +54,39 @@ class Cart implements CartInterface, TotalingInterface
     private $cartFactory;
 
     /**
+     * @var OrderFactoryInterface $orderFactory
+     */
+    private $orderFactory;
+
+    /**
+     * @var DispatcherInterface $dispatcher
+     */
+    private $dispatcher;
+
+    /**
      * Cart constructor.
-     * @param ContainerInterface $app
      * @param ShopInterface $shop
+     * @param PaymentInterface $payment
      * @param CartStorageInterface $cartStorage
      * @param CartFactoryInterface $cartFactory
+     * @param OrderFactoryInterface $orderFactory
+     * @param DispatcherInterface $dispatcher
      */
-    public function __construct(ContainerInterface $app, ShopInterface $shop, CartStorageInterface $cartStorage, CartFactoryInterface $cartFactory)
+    public function __construct(
+        ShopInterface $shop,
+        PaymentInterface $payment,
+        CartStorageInterface $cartStorage,
+        CartFactoryInterface $cartFactory,
+        OrderFactoryInterface $orderFactory,
+        DispatcherInterface $dispatcher
+    )
     {
-        $this->app = $app;
         $this->shop = $shop;
+        $this->payment = $payment;
         $this->cartStorage = $cartStorage;
         $this->cartFactory = $cartFactory;
+        $this->orderFactory = $orderFactory;
+        $this->dispatcher = $dispatcher;
         $this->restore();
     }
 
@@ -109,6 +132,9 @@ class Cart implements CartInterface, TotalingInterface
             $cart_item->item_class = $item_class;
             $cart_item->quantity = $quantity;
             $cart_item->save();
+
+            // Dispatch a buyable added event
+            $this->dispatcher->dispatch(BuyableAdded::class, new BuyableAdded($this, $buyable));
         }
     }
 
@@ -124,6 +150,9 @@ class Cart implements CartInterface, TotalingInterface
             ]);
 
             $cart_item->delete();
+
+            // Dispatch a buyable removed event
+            $this->dispatcher->dispatch(BuyableRemoved::class, new BuyableRemoved($this, $buyable));
 
         } catch (FetchException $e) {
             //
@@ -204,6 +233,9 @@ class Cart implements CartInterface, TotalingInterface
 
             $this->cart->discount = $discount;
             $this->cart->save();
+
+            // Dispatch a discount added event
+            $this->dispatcher->dispatch(DiscountAdded::class, new DiscountAdded($this, $discount));
         }
     }
 
@@ -260,8 +292,6 @@ class Cart implements CartInterface, TotalingInterface
      */
     public function getReduction(): float
     {
-        $total = $this->getSubTotal() + $this->getFulfillmentCost();
-
         if (($discount = $this->getDiscount())) {
             return $discount->coupon->getReduction($this);
         }
@@ -276,24 +306,7 @@ class Cart implements CartInterface, TotalingInterface
     public function checkout(CustomerInterface $customer): OrderInterface
     {
         // Create the order
-        $order = new Order();
-        $order->created = time();
-        $order->updated = time();
-        $order->total = $this->getTotal();
-        $order->subtotal = $this->getSubTotal();
-        $order->reduction = $this->getReduction();
-        $order->fulfillment_cost = $this->getFulfillmentCost();
-        $order->fulfillment_method = ($this->getFulfillment() ? $this->getFulfillment()->getId() : null);
-        $order->discount = $this->getDiscount();
-        $order->customer = $customer;
-        $order->save();
-
-        // Generate an order id
-        $start = rand(5, 8);
-        $rest = 8 - $start;
-
-        $order->order_id = $order->id.'-'.\dry\util\string\random($start).'_'.\dry\util\string\random($rest);
-        $order->save();
+        $order = $this->orderFactory->create($customer);
 
         // Add all items to the order
         foreach ($this->items() as $item) {
@@ -301,14 +314,18 @@ class Cart implements CartInterface, TotalingInterface
         }
 
         // Dispatch an order created event
-        Dispatcher::dispatch(Created::class, new Created($order));
+        $this->dispatcher->dispatch(Created::class, new Created($order));
 
         // Pay
-        $this->app->get(PaymentInterface::class)->pay($order);
+        $this->payment->pay($order);
 
+        // Give back the order
         return $order;
     }
 
+    /**
+     * @return mixed
+     */
     public function getIdentifier()
     {
         return $this->cart->getIdentifier();
