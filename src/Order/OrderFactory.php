@@ -11,27 +11,20 @@ use Tnt\Ecommerce\Model\Order;
 class OrderFactory implements OrderFactoryInterface
 {
     /**
-     * @var CartInterface $cart
-     */
-    private $cart;
-
-    /**
      * @var OrderIdGeneratorInterface $idGenerator
      */
     private $idGenerator;
 
     /**
      * OrderFactory constructor.
-     * @param CartInterface $cart
      * @param OrderIdGeneratorInterface $idGenerator
      */
-    public function __construct(CartInterface $cart, OrderIdGeneratorInterface $idGenerator)
+    public function __construct(OrderIdGeneratorInterface $idGenerator)
     {
-        $this->cart = $cart;
         $this->idGenerator = $idGenerator;
     }
 
-    public function create(CustomerInterface $customer): Order
+    public function create(CartInterface $cart, CustomerInterface $customer): Order
     {
         // Create the order
         $order = new Order();
@@ -49,6 +42,11 @@ class OrderFactory implements OrderFactoryInterface
         // Generate order id
         $order->order_id = $this->idGenerator->generate($order);
         $order->save();
+
+        // Add all items to the order
+        foreach ($cart->items() as $item) {
+            $order->add($item);
+        }
 
         return $order;
     }

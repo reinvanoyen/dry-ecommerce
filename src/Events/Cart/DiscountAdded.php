@@ -3,7 +3,6 @@
 namespace Tnt\Ecommerce\Events\Cart;
 
 use Tnt\Ecommerce\Contracts\CartInterface;
-use Tnt\Ecommerce\Events\Order\CartEvent;
 use Tnt\Ecommerce\Model\DiscountCode;
 
 class DiscountAdded extends CartEvent

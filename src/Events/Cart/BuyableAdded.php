@@ -4,7 +4,6 @@ namespace Tnt\Ecommerce\Events\Cart;
 
 use Tnt\Ecommerce\Contracts\BuyableInterface;
 use Tnt\Ecommerce\Contracts\CartInterface;
-use Tnt\Ecommerce\Events\Order\CartEvent;
 
 class BuyableAdded extends CartEvent
 {

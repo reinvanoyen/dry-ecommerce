@@ -306,12 +306,7 @@ class Cart implements CartInterface, TotalingInterface
     public function checkout(CustomerInterface $customer): OrderInterface
     {
         // Create the order
-        $order = $this->orderFactory->create($customer);
-
-        // Add all items to the order
-        foreach ($this->items() as $item) {
-            $order->add($item);
-        }
+        $order = $this->orderFactory->create($this, $customer);
 
         // Dispatch an order created event
         $this->dispatcher->dispatch(Created::class, new Created($order));

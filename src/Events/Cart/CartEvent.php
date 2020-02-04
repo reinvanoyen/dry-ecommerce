@@ -1,6 +1,6 @@
 <?php
 
-namespace Tnt\Ecommerce\Events\Order;
+namespace Tnt\Ecommerce\Events\Cart;
 
 use Oak\Dispatcher\Event;
 use Tnt\Ecommerce\Contracts\CartInterface;

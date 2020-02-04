@@ -6,5 +6,5 @@ use Tnt\Ecommerce\Model\Order;
 
 interface OrderFactoryInterface
 {
-    public function create(CustomerInterface $customer): Order;
+    public function create(CartInterface $cart, CustomerInterface $customer): Order;
 }
