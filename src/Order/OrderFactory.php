@@ -30,12 +30,12 @@ class OrderFactory implements OrderFactoryInterface
         $order = new Order();
         $order->created = time();
         $order->updated = time();
-        $order->total = $this->cart->getTotal();
-        $order->subtotal = $this->cart->getSubTotal();
-        $order->reduction = $this->cart->getReduction();
-        $order->fulfillment_cost = $this->cart->getFulfillmentCost();
-        $order->fulfillment_method = ($this->cart->getFulfillment() ? $this->cart->getFulfillment()->getId() : null);
-        $order->discount = $this->cart->getDiscount();
+        $order->total = $cart->getTotal();
+        $order->subtotal = $cart->getSubTotal();
+        $order->reduction = $cart->getReduction();
+        $order->fulfillment_cost = $cart->getFulfillmentCost();
+        $order->fulfillment_method = ($cart->getFulfillment() ? $cart->getFulfillment()->getId() : null);
+        $order->discount = $cart->getDiscount();
         $order->customer = $customer;
         $order->save();
 
